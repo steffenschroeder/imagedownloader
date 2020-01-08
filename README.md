@@ -7,6 +7,7 @@ Use at least Python 3.8
 
 
 Installation
+------------
 ```
 pip install -r requirements.txt
 ```
@@ -17,9 +18,9 @@ Usage
 -----
 
 ```
-python download_images.py <image_url>
+python download_images.py FILE...
 ```
-
+where `FILE` contains one one image URL per line
 
 
 ### Contributing

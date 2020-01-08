@@ -1,3 +1,4 @@
+import fileinput
 import logging
 import sys
 
@@ -5,22 +6,30 @@ import requests
 
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <image url>")
+    if len(sys.argv) < 2:
+        print(f"Usage: {sys.argv[0]} <file...>")
         sys.exit(1)
 
-    image_url = sys.argv[1]
-    download_image_to_disk(image_url)
+    filenames = sys.argv[1:]
+    download_images_from_files(filenames)
+
+
+def download_images_from_files(files):
+    for url in fileinput.input(files):
+        download_image_to_disk(url.strip())
 
 
 def download_image_to_disk(image_url):
+    if not image_url:
+        return
     try:
         response = requests.get(image_url)
     except requests.RequestException as e:
         logging.warning(f"Image {image_url} cannot be downloaded (Exception: {e})")
         return
     if response.ok:
-        with open("result.jpeg", "wb") as result_file:
+        name = _get_filename_by_url(image_url)
+        with open(name, "wb") as result_file:
             result_file.write(response.content)
     elif response.status_code == 404:
         logging.warning(f"Image {image_url} does not exist")
@@ -28,6 +37,10 @@ def download_image_to_disk(image_url):
         logging.warning(
             f"Image {image_url} cannot be downloaded (HTTP Status: {response.status_code})"
         )
+
+
+def _get_filename_by_url(url):
+    return url.rsplit("/", 1)[-1]
 
 
 if __name__ == "__main__":
