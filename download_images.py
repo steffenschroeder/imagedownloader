@@ -14,7 +14,7 @@ def main():
 
 def download_image_to_disk(image_url):
     response = requests.get(image_url)
-    with open("result.jpeg", 'wb') as result_file:
+    with open("result.jpeg", "wb") as result_file:
         result_file.write(response.content)
 
 
