@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import requests
@@ -18,13 +19,13 @@ def download_image_to_disk(image_url):
         with open("result.jpeg", "wb") as result_file:
             result_file.write(response.content)
     elif response.status_code == 404:
-        print(f"Image {image_url} does not exist", file=sys.stderr)
+        logging.warning(f"Image {image_url} does not exist")
     else:
-        print(
-            f"Image {image_url} cannot be downloaded (HTTP Status: {response.status_code})",
-            file=sys.stderr,
+        logging.warning(
+            f"Image {image_url} cannot be downloaded (HTTP Status: {response.status_code})"
         )
 
 
 if __name__ == "__main__":
+    logging.basicConfig()
     main()
