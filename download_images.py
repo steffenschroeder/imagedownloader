@@ -14,7 +14,11 @@ def main():
 
 
 def download_image_to_disk(image_url):
-    response = requests.get(image_url)
+    try:
+        response = requests.get(image_url)
+    except requests.RequestException as e:
+        logging.warning(f"Image {image_url} cannot be downloaded (Exception: {e})")
+        return
     if response.ok:
         with open("result.jpeg", "wb") as result_file:
             result_file.write(response.content)

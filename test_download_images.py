@@ -20,3 +20,9 @@ def test_download_but_failing(target_dir, status_code):
     download_image_to_disk(f"https://httpbin.org/status/{status_code}")
 
     assert len(target_dir.listdir()) == 0
+
+
+def test_download_no_url(target_dir):
+    download_image_to_disk("")
+
+    assert len(target_dir.listdir()) == 0
