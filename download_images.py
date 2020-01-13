@@ -1,4 +1,3 @@
-import fileinput
 import logging
 import sys
 
@@ -15,8 +14,14 @@ def main():
 
 
 def download_images_from_files(files):
-    for url in fileinput.input(files):
-        download_image_to_disk(url.strip())
+    for filename in files:
+        try:
+            with open(filename) as f:
+                for url in f:
+                    download_image_to_disk(url.strip())
+        except FileNotFoundError:
+            logging.error(f"File {filename} does not exist")
+            pass
 
 
 def download_image_to_disk(image_url):

@@ -43,6 +43,13 @@ def test_download_from_file():
     assert_current_folder_contains_files("file1.txt", "200.jpg")
 
 
+def test_download_from_non_existing_file():
+    download_images_from_files(["nonexisting.txt"])
+
+    # output folder contains no extra files, no error is thrown
+    assert_current_folder_contains_files()
+
+
 def test_download_from_multiple_files():
     write_file_with_content(
         "file1.txt", "https://picsum.photos/100.jpg", "https://picsum.photos/200.jpg"
