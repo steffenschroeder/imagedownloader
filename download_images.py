@@ -53,12 +53,12 @@ def download_image_to_disk(image_url):
         )
 
 
-def _get_filename_by_url(url):
-    return url.rsplit("/", 1)[-1]
-
-
 def _is_jpeg_url(url):
     return url and url.endswith(".jpg") or url.endswith(".jpeg")
+
+
+def _get_filename_by_url(url):
+    return url.rsplit("/", 1)[-1]
 
 
 if __name__ == "__main__":
