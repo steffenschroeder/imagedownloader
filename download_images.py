@@ -1,15 +1,20 @@
+import argparse
 import logging
-import sys
 
 import requests
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <file...>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "file",
+        nargs="+",
+        type=str,
+        help="File containing Images URLs to download. One URL per line",
+    )
+    args = parser.parse_args()
 
-    filenames = sys.argv[1:]
+    filenames = args.file
     download_images_from_files(filenames)
 
 
