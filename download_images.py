@@ -13,11 +13,11 @@ def main():
     download_images_from_files(filenames)
 
 
-def download_images_from_files(files):
-    for filename in files:
+def download_images_from_files(filesnames):
+    for filename in filesnames:
         try:
-            with open(filename) as f:
-                for url in f:
+            with open(filename) as file_with_urls:
+                for url in file_with_urls:
                     download_image_to_disk(url.strip())
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
@@ -27,6 +27,10 @@ def download_images_from_files(files):
 def download_image_to_disk(image_url):
     if not image_url:
         return
+    if not _is_jpeg_url(image_url):
+        logging.error(
+            f"URL {image_url} is not a jpeg (does not end with .jpg or .jpeg)"
+        )
     try:
         response = requests.get(image_url)
     except requests.RequestException as e:
@@ -46,6 +50,10 @@ def download_image_to_disk(image_url):
 
 def _get_filename_by_url(url):
     return url.rsplit("/", 1)[-1]
+
+
+def _is_jpeg_url(url):
+    return url and url.endswith(".jpg") or url.endswith(".jpeg")
 
 
 if __name__ == "__main__":

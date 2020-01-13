@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from download_images import _get_filename_by_url
+from download_images import _is_jpeg_url
 from download_images import download_image_to_disk
 from download_images import download_images_from_files
 
@@ -74,3 +75,17 @@ def assert_current_folder_contains_files(*filenames):
         filename.name for filename in Path().glob("*") if filename.is_file()
     ]
     assert set(file_in_directory) == set(filenames)
+
+
+@pytest.mark.parametrize(
+    "url, expected",
+    [
+        ["", False],
+        ["https://www.google.com", False],
+        ["https://totalcommander.ch/win/tcmd922ax64.exe", False],
+        ["https://picsum.photos/200.jpg", True],
+        ["https://picsum.photos/200.jpeg", True],
+    ],
+)
+def test_url_is_jpeg(url, expected):
+    assert _is_jpeg_url(url) == expected
