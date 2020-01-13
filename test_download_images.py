@@ -15,9 +15,27 @@ def target_dir(tmpdir):
 
 
 def write_file_with_content(filename, *lines):
+    """
+    writes ``lines`` to file with name  ``filename``
+    :param filename: name of the file to write
+    :param lines: lines to write to that file
+    :return:
+    """
     with open(filename, "w") as f:
         for line in lines:
             f.writelines(line + "\n")
+
+
+def assert_current_folder_contains_files(*filenames):
+    """
+    asserts the the current folder contains exactly the files mentioned in filenames
+    :param filenames: files to be present in the current folder
+    :return:
+    """
+    file_in_directory = [
+        filename.name for filename in Path().glob("*") if filename.is_file()
+    ]
+    assert set(file_in_directory) == set(filenames)
 
 
 def test_download_single_image():
@@ -68,13 +86,6 @@ def test_download_from_multiple_files():
 
 def test_get_filename_by_url():
     assert _get_filename_by_url("https://picsum.photos/200.jpg") == "200.jpg"
-
-
-def assert_current_folder_contains_files(*filenames):
-    file_in_directory = [
-        filename.name for filename in Path().glob("*") if filename.is_file()
-    ]
-    assert set(file_in_directory) == set(filenames)
 
 
 @pytest.mark.parametrize(
