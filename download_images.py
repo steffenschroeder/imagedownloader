@@ -24,9 +24,8 @@ def download_images_from_files(filesnames):
         try:
             with open(filename) as file_with_urls:
                 urls_to_download = [url.strip() for url in file_with_urls]
-                pool = multiprocessing.Pool()
-                pool.map(download_image_to_disk, urls_to_download)
-
+                with multiprocessing.Pool() as pool:
+                    pool.map(download_image_to_disk, urls_to_download)
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
             pass
