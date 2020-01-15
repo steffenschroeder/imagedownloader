@@ -1,5 +1,6 @@
 import argparse
 import logging
+import multiprocessing
 
 import requests
 
@@ -22,8 +23,10 @@ def download_images_from_files(filesnames):
     for filename in filesnames:
         try:
             with open(filename) as file_with_urls:
-                for url in file_with_urls:
-                    download_image_to_disk(url.strip())
+                urls_to_download = [url.strip() for url in file_with_urls]
+                pool = multiprocessing.Pool()
+                pool.map(download_image_to_disk, urls_to_download)
+
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
             pass
