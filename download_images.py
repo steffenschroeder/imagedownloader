@@ -1,10 +1,11 @@
 import argparse
+import asyncio
 import logging
 
-import requests
+import aiohttp
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "file",
@@ -15,42 +16,45 @@ def main():
     args = parser.parse_args()
 
     filenames = args.file
-    download_images_from_files(filenames)
+    await download_images_from_files(filenames)
 
 
-def download_images_from_files(filesnames):
+async def download_images_from_files(filesnames):
+    urls = []
     for filename in filesnames:
         try:
             with open(filename) as file_with_urls:
                 for url in file_with_urls:
-                    download_image_to_disk(url.strip())
+                    urls.append(url.strip())
+
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
             pass
 
+    coroutines = [download_image_to_disk(url) for url in urls]
+    await asyncio.gather(*coroutines)
 
-def download_image_to_disk(image_url):
+
+async def download_image_to_disk(image_url):
     if not image_url:
         return
     if not _is_jpeg_url(image_url):
         logging.error(
             f"URL {image_url} is not a jpeg (does not end with .jpg or .jpeg)"
         )
-    try:
-        response = requests.get(image_url)
-    except requests.RequestException as e:
-        logging.warning(f"Image {image_url} cannot be downloaded (Exception: {e})")
-        return
-    if response.ok:
-        name = _get_filename_by_url(image_url)
-        with open(name, "wb") as result_file:
-            result_file.write(response.content)
-    elif response.status_code == 404:
-        logging.warning(f"Image {image_url} does not exist")
-    else:
-        logging.warning(
-            f"Image {image_url} cannot be downloaded (HTTP Status: {response.status_code})"
-        )
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(image_url) as response:
+            if response.status == 200:
+                name = _get_filename_by_url(image_url)
+                with open(name, "wb") as result_file:
+                    result_file.write(await response.read())
+            elif response.status == 400:
+                logging.warning(f"Image {image_url} does not exist")
+            else:
+                logging.warning(
+                    f"Image {image_url} cannot be downloaded (HTTP Status: {response.status})"
+                )
 
 
 def _is_jpeg_url(url):
@@ -63,4 +67,4 @@ def _get_filename_by_url(url):
 
 if __name__ == "__main__":
     logging.basicConfig()
-    main()
+    asyncio.run(main())

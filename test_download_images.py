@@ -38,38 +38,44 @@ def assert_current_folder_contains_files(*filenames):
     assert set(file_in_directory) == set(filenames)
 
 
-def test_download_single_image():
-    download_image_to_disk("https://picsum.photos/200.jpg")
+@pytest.mark.asyncio
+async def test_download_single_image():
+    await download_image_to_disk("https://picsum.photos/200.jpg")
     assert_current_folder_contains_files("200.jpg")
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize("status_code", [404, 500])
-def test_download_but_failing(target_dir, status_code):
-    download_image_to_disk(f"https://httpbin.org/status/{status_code}")
+async def test_download_but_failing(target_dir, status_code):
+    await download_image_to_disk(f"https://httpbin.org/status/{status_code}")
     assert len(target_dir.listdir()) == 0
 
 
-def test_download_no_url(target_dir):
-    download_image_to_disk("")
+@pytest.mark.asyncio
+async def test_download_no_url(target_dir):
+    await download_image_to_disk("")
     assert len(target_dir.listdir()) == 0
 
 
-def test_download_from_file():
+@pytest.mark.asyncio
+async def test_download_from_file():
     write_file_with_content("file1.txt", "https://picsum.photos/200.jpg")
 
-    download_images_from_files(["file1.txt"])
+    await download_images_from_files(["file1.txt"])
 
     assert_current_folder_contains_files("file1.txt", "200.jpg")
 
 
-def test_download_from_non_existing_file():
-    download_images_from_files(["nonexisting.txt"])
+@pytest.mark.asyncio
+async def test_download_from_non_existing_file():
+    await download_images_from_files(["nonexisting.txt"])
 
     # output folder contains no extra files, no error is thrown
     assert_current_folder_contains_files()
 
 
-def test_download_from_multiple_files():
+@pytest.mark.asyncio
+async def test_download_from_multiple_files():
     write_file_with_content(
         "file1.txt", "https://picsum.photos/100.jpg", "https://picsum.photos/200.jpg"
     )
@@ -77,7 +83,7 @@ def test_download_from_multiple_files():
         "file2.txt", "https://picsum.photos/300.jpg", "https://picsum.photos/400.jpg"
     )
 
-    download_images_from_files(["file1.txt", "file2.txt"])
+    await download_images_from_files(["file1.txt", "file2.txt"])
 
     assert_current_folder_contains_files(
         "file1.txt", "file2.txt", "100.jpg", "200.jpg", "300.jpg", "400.jpg"
