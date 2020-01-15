@@ -1,6 +1,6 @@
 import argparse
+import concurrent.futures
 import logging
-import multiprocessing
 
 import requests
 
@@ -24,8 +24,8 @@ def download_images_from_files(filesnames):
         try:
             with open(filename) as file_with_urls:
                 urls_to_download = [url.strip() for url in file_with_urls]
-                with multiprocessing.Pool() as pool:
-                    pool.map(download_image_to_disk, urls_to_download)
+                with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                    executor.map(download_image_to_disk, urls_to_download)
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
             pass
