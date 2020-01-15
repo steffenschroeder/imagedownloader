@@ -18,15 +18,14 @@ def main():
     download_images_from_files(filenames)
 
 
-def download_images_from_files(filesnames):
-    for filename in filesnames:
+def download_images_from_files(filenames):
+    for filename in filenames:
         try:
             with open(filename) as file_with_urls:
                 for url in file_with_urls:
                     download_image_to_disk(url.strip())
         except FileNotFoundError:
             logging.error(f"File {filename} does not exist")
-            pass
 
 
 def download_image_to_disk(image_url):
@@ -54,10 +53,13 @@ def download_image_to_disk(image_url):
 
 
 def _is_jpeg_url(url):
+    # FIXME the code could check the content type or the magic bytes of the response
     return url and url.endswith(".jpg") or url.endswith(".jpeg")
 
 
 def _get_filename_by_url(url):
+    # FIXME this is dangerous if we are on windows systems
+    # could be http://something.com/c:\foo.jpg - could be a path traversal attack
     return url.rsplit("/", 1)[-1]
 
 
